@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "gravvits"
+version = "0.1.0"
+description = ""
+authors = ["mremule <https://github.com/mremule>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["standard"], version = "^0.115.4"}
+sqlalchemy = "^2.0.36"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
