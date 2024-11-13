@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  push:
+    branches:
+      - main
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+
+    steps:
+      - name: Find Changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - '**/*.py'
+              - 'poetry.lock'
+              - 'pyproject.toml'
+
+  lint:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    uses: ./.github/workflows/lint-python.yml
+
+  build-and-deploy:
+    needs: lint
+    if: ${{ success() }}
+    uses: ./.github/workflows/build-and-deploy.yml
