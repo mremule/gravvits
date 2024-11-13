@@ -16,8 +16,12 @@ jobs:
       pull-requests: read
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
+      docker: ${{ steps.filter.outputs.docker }}
 
     steps:
+      - name: Checkout
+      - uses: actions/checkout@v4
+
       - name: Find Changes
         uses: dorny/paths-filter@v3
         id: filter
@@ -27,6 +31,9 @@ jobs:
               - '**/*.py'
               - 'poetry.lock'
               - 'pyproject.toml'
+            docker:
+              - '**/Dockerfile'
+              - '**/docker-compose.yml'
 
   lint:
     needs: changes
@@ -34,6 +41,6 @@ jobs:
     uses: ./.github/workflows/lint-python.yml
 
   build-and-deploy:
-    needs: lint
-    if: ${{ success() }}
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' || ( needs.changes.outputs.backend == 'false' && needs.changes.outputs.docker == 'true' )  }}
     uses: ./.github/workflows/build-and-deploy.yml
