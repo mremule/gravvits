@@ -1,36 +1,24 @@
 name: Build and Deploy Docker Image
 
 on:
-  workflow_call:
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
-    name: Build
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
+
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+      EC2_SSH: ${{ secrets.EC2_SSH }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: DockerHub Login
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
-      - name: Build Docker Image
-        run: |
-          docker build -t mremule/gravvits:${{ github.sha }} .
-
-      - name: Push Docker Image
-        run: |
-          docker push mremule/gravvits:${{ github.sha }}
-
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.1.0
         with:
@@ -38,10 +26,9 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH }}
           script: |
-            docker pull mremule/gravvits:${{ github.sha }}
-            docker stop gravvits || true
-            docker rm gravvits || true
-            docker run -d --name gravvits -p 8000:8000 mremule/gravvits:${{ github.sha }}
+            cd ~/gravvits
+            git pull origin main
+            docker compose up -d --build
 
       - name: Set Commit Status
         if: always()

@@ -5,9 +5,6 @@ on:
     types:
       - opened
       - synchronize
-  push:
-    branches:
-      - main
 
 jobs:
   changes:
@@ -16,7 +13,6 @@ jobs:
       pull-requests: read
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
-      docker: ${{ steps.filter.outputs.docker }}
 
     steps:
       - name: Checkout
@@ -31,16 +27,8 @@ jobs:
               - '**/*.py'
               - 'poetry.lock'
               - 'pyproject.toml'
-            docker:
-              - '**/Dockerfile'
-              - '**/docker-compose.yml'
 
   lint:
     needs: changes
     if: ${{ needs.changes.outputs.backend == 'true' }}
     uses: ./.github/workflows/lint-python.yml
-
-  build-and-deploy:
-    needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' || ( needs.changes.outputs.backend == 'false' && needs.changes.outputs.docker == 'true' )  }}
-    uses: ./.github/workflows/build-and-deploy.yml
