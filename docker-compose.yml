@@ -1,0 +1,10 @@
+# This file is for development only.
+services:
+  backend:
+    container_name: backend
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    restart: always
