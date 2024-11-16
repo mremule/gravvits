@@ -36,7 +36,7 @@ jobs:
           script: |
             const state = '${{ job.status }}'
             const targetUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
-            const description = state === 'success' ?  '🚀 SUCCESS: DEPLOY' : '❌ Something went wrong while deploying...'
+            const description = state === 'success' ?  '⚓️ SUCCESS: DEPLOY' : '❌ Something went wrong while deploying...'
 
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
