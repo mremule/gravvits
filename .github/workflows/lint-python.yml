@@ -1,8 +1,7 @@
-name: Python Linting
+name: Lint Python
 
 on:
   workflow_call:
-
 concurrency:
   group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
   cancel-in-progress: true
@@ -33,11 +32,11 @@ jobs:
 
       - name: Set Commit Status
         if: always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v6
         with:
           script: |
             const state = '${{ job.status }}'
-            const description = state === 'success' ?  '🟢 SUCCESS: PYTHON LINTING 🖍' : '❌ Something went wrong while linting python...'
+            const description = state === 'success' ?  '✏️ SUCCESS: LINT PYTHON' : '❌ Something went wrong while linting python...'
             
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
